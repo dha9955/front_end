@@ -1,9 +1,8 @@
 /* eslint-disable */
 
-
 import React, { useState } from "react";
 import Header from "../../components/Header";
-import { Row, Container, Table, Col, Button  } from "react-bootstrap";
+import { Row, Container, Table, Col, Button } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import { addContact } from "../../actions";
 import Input from "../../components/UI/Input";
@@ -13,7 +12,7 @@ import axios from "axios";
 import { apibase } from "../../APIs/baseApi";
 import { contactConstants } from "../../actions/constants";
 
-import moment from 'moment'
+import moment from "moment";
 
 /**
  * @author
@@ -21,7 +20,6 @@ import moment from 'moment'
  **/
 
 const Home = (props) => {
-
   const [firstName, setFirstName] = useState("");
   const [middleName, setMiddleName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -33,12 +31,14 @@ const Home = (props) => {
   const [contactDetailModal, setContactDetailModal] = useState(false);
   const [contactDetails, setContactDetails] = useState(null);
 
+  let [ choosedOBJ , setChoosedOBJ ] = useState({
+
+  })
+
   const dispatch = useDispatch();
   const contact = useSelector((state) => state.contact);
 
-  const handleClose = () => {
-    setShow(false);
-  };
+  const handleClose = () => setShow(false)
 
   const submitContactFomr = () => {
     const form = new FormData();
@@ -65,7 +65,28 @@ const Home = (props) => {
         <thead className="thead-dark">
           <tr>
             <th>
-              <input type='checkbox' />
+
+              <input type="checkbox" 
+              checked={ Object.keys(choosedOBJ).length === contact.contacts.length } 
+              onChange={e => {
+
+                let o = {}
+
+                contact.contacts.map(x => {
+                  o[x._id] = true
+                  return 
+                })
+
+                if( Object.keys(choosedOBJ).length < Object.keys(o).length ) {
+                  choosedOBJ = o
+                } else {
+                  choosedOBJ = {}
+                }
+
+                setChoosedOBJ({...choosedOBJ})
+
+              }} />
+
             </th>
             <th>#</th>
             <th>Name</th>
@@ -75,28 +96,37 @@ const Home = (props) => {
           </tr>
         </thead>
         <tbody>
-
           {contact.contacts.length > 0
-          ? contact.contacts.map((contact , i) => (
-            <tr key = {contact._id}>
-              <td>
-                <input type='checkbox' onChange={e => {
-                  console.log(e.target.checked , contact._id)
-                }} />
-              </td>
-              <td>{i+1}</td>
-              <td>{contact.firstName} {contact.middleName} {contact.lastName}</td>
-              <td>{contact.directManageId}</td>
-              <td>{moment(contact.startDate).format('DD/MM/yyyy')}</td>
-              <td>
-                <button onClick={() => showContactDetailsModal(contact)}>
-                  info
-                </button>
-              </td>
-            </tr>
-          ))
-          : null}
-
+            ? contact.contacts.map((contact, i) => (
+                <tr key={contact._id}>
+                  <td>
+                    <input
+                      type="checkbox" 
+                      checked={choosedOBJ[contact._id]}
+                      onChange={(e) => {
+                        if( choosedOBJ[contact._id] ) {
+                          delete choosedOBJ[contact._id]
+                        } else {
+                          choosedOBJ[contact._id] = true
+                        }
+                        setChoosedOBJ({...choosedOBJ})
+                      }}
+                    />
+                  </td>
+                  <td>{i + 1}</td>
+                  <td>
+                    {contact.firstName} {contact.middleName} {contact.lastName}
+                  </td>
+                  <td>{contact.directManageId}</td>
+                  <td>{moment(contact.startDate).format("DD/MM/yyyy")}</td>
+                  <td>
+                    <button onClick={() => showContactDetailsModal(contact)}>
+                      info
+                    </button>
+                  </td>
+                </tr>
+              ))
+            : null}
         </tbody>
       </Table>
     );
@@ -173,7 +203,7 @@ const Home = (props) => {
           </Col>
           <Col md="6">
             <label className="key">Date of Birth</label>
-            <p className="value">{contactDetails.DOB}</p>
+            <p className="value">{moment(contactDetails.DOB).format('DD/MM/yyyy')}</p>
           </Col>
           <Col md="6">
             <label className="key">Gender</label>
@@ -183,12 +213,14 @@ const Home = (props) => {
         <Row>
           <Col md="6">
             <label className="key">Start Date</label>
-            <p className="value">{contactDetails.startDate}</p>
+            <p className="value">{moment(contactDetails.startDate).format('DD/MM/yyyy')}</p>
           </Col>
         </Row>
       </Modal>
     );
   };
+
+
 
   return (
     <div>
@@ -196,40 +228,51 @@ const Home = (props) => {
       <Container>
         <Row style={{ marginTop: "100px" }}>
           <Col>
+            <h2 style={{ marginLeft: "30%" }}>Contact Management System</h2>
 
-            <h2 style={{marginLeft:"30%"}}>Contact Management System</h2>
-
-            <div style={{ display : 'flex' }}>
-
+            <div style={{ display: "flex" }}>
               <Button variant="dark">Add Contact</Button>
 
-              <input placeholder='First name' onChange={e => setFirstName(e.target.value)} />
-              <input placeholder='Middle name' onChange={e => setMiddleName(e.target.value)} />
-              <input placeholder='Last name' onChange={e => setLastName(e.target.value)} />
+              <input
+                placeholder="First name"
+                onChange={(e) => setFirstName(e.target.value)}
+              />
+              <input
+                placeholder="Middle name"
+                onChange={(e) => setMiddleName(e.target.value)}
+              />
+              <input
+                placeholder="Last name"
+                onChange={(e) => setLastName(e.target.value)}
+              />
 
-              <Button onClick={e => {
-
-                let obj = {
-                  fName : firstName !== '' ? firstName : undefined , 
-                  mName : middleName !== '' ? middleName : undefined , 
-                  lName : lastName !== '' ? lastName : undefined
-                }
-                axios.post( apibase.localHost+'/api/contact/search' , obj )
-                .then(res => {
-                  let data = res.data.data
-                  dispatch({
-                    type : contactConstants.GET_ALL_CONTACTS_SUCCESS ,
-                    payload : {
-                      contacts : data
-                    }
-                  })
-                })
-              }}>
-                <i>
-
-                </i>
+              <Button
+                onClick={(e) => {
+                  let obj = {
+                    fName: firstName !== "" ? firstName : undefined,
+                    mName: middleName !== "" ? middleName : undefined,
+                    lName: lastName !== "" ? lastName : undefined,
+                  };
+                  axios
+                    .post(apibase.localHost + "/api/contact/search", obj)
+                    .then((res) => {
+                      let data = res.data.data;
+                      dispatch({
+                        type: contactConstants.GET_ALL_CONTACTS_SUCCESS,
+                        payload: {
+                          contacts: data,
+                        },
+                      });
+                    });
+                }}
+              >
+                <i></i>
               </Button>
 
+              <button disabled={ Object.keys(choosedOBJ).length === 0 } onClick={ e => {
+                console.log(Object.keys(choosedOBJ))
+
+              }}>Xoá</button>
             </div>
             {renderContacts()}
           </Col>
