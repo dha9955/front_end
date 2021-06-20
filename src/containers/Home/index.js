@@ -155,8 +155,32 @@ const Home = (props) => {
         <Input
           label="Last Name"
           value={lastName}
-          placeholder={`last Name`}
+          placeholder={`Last Name`}
           onChange={(e) => setLastName(e.target.value)}
+        />
+        <Input
+          label="Direct Manager"
+          value={directManageId}
+          placeholder={`Direct Manager`}
+          onChange={(e) => setDirectManageId(e.target.value)}
+        />
+        <Input
+          label="Gender"
+          value={gender}
+          placeholder={`Gender`}
+          onChange={(e) => setGender(e.target.value)}
+        />
+        <Input
+          label="Date of Birth"
+          value={DOB}
+          placeholder={`DOB`}
+          onChange={(e) => setDOB(e.target.value)}
+        />
+        <Input
+          label="Start Date"
+          value={startDate}
+          placeholder={`Start Date`}
+          onChange={(e) => setStartDate(e.target.value)}
         />
       </Modal>
     );
