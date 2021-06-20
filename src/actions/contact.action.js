@@ -15,17 +15,31 @@ export const getContacts = () => {
       } else {
         dispatch({ type: contactConstants.GET_ALL_CONTACTS_FAILURE });
       }
-      console.log(res)
+      console.log(res);
     } catch (error) {
       console.log(error);
     }
   };
 };
 
-// export const addContact = (form) => {
-//   return async (dispatch) => {
-//     try{
-//       dispatch
-//     }
-//   }
-// }
+export const addContact = (form) => {
+  return async (dispatch) => {
+    dispatch({ type: contactConstants.ADD_CONTACT_REQUEST });
+    try {
+      const res = await axios.post(`/contact/create`, form);
+      if (res.status === 201) {
+        dispatch({
+          type: contactConstants.ADD_CONTACT_SUCCESS,
+          payload: { contact: res.data.contact },
+        });
+      } else {
+        dispatch({
+          type: contactConstants.ADD_CONTACT_FAILURE,
+          payload: res.data.error,
+        });
+      }
+    } catch (error) {
+      console.log(error.response);
+    }
+  };
+};
