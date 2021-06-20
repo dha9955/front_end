@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import { userConstants } from "../actions/constants";
 
 const initState = {
@@ -64,6 +66,9 @@ export default (state = initState, action) => {
         loading: false,
       };
       break;
+    default : {
+      return state
+    }
   }
   return state;
 };

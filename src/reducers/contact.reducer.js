@@ -4,14 +4,21 @@ const initialState = {
   contacts: [],
 };
 
-export default (state = initialState, action) => {
+let contactReducer = ( state = initialState, action ) => {
   switch (action.type) {
-    case contactConstants.GET_ALL_CONTACTS_SUCCESS:
-      state = {
+    case contactConstants.GET_ALL_CONTACTS_SUCCESS: {
+      let o = {
         ...state,
         contacts: action.payload.contacts,
       };
-      break;
+      return o
+    }
+  
+    default : {
+      return state
+    }
   }
-  return state;
-};
+  
+}
+
+export let contactRed = contactReducer

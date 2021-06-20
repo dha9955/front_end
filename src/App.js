@@ -1,6 +1,6 @@
 import React, {useEffect} from "react";
 import './App.css';
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { Route, Switch } from "react-router-dom";
 import Signin from "./containers/Signin";
 import Home from "./containers/Home";
 import Signup from "./containers/Signup";
@@ -14,14 +14,14 @@ function App() {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
 
-  useEffect(()=>{
+  useEffect(() => {
     if (!user.authenticate) {
       dispatch(isUserLoggedIn());
     }
-    if(user.authenticate){
+    if(user.authenticate) {
       dispatch(getContacts());
     }
-  }, [user.authenticate])
+  }, [ user.authenticate , dispatch ])
 
   return (
     <div className="App">

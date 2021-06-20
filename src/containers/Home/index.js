@@ -1,18 +1,26 @@
+/* eslint-disable */
+
+
 import React, { useState } from "react";
 import Header from "../../components/Header";
-import { Row, Container, Table, Col, Button } from "react-bootstrap";
+import { Row, Container, Table, Col, Button  } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import "./style.css";
+import axios from "axios";
+import { apibase } from "../../APIs/baseApi";
+import { contactConstants } from "../../actions/constants";
+
+import moment from 'moment'
 
 /**
  * @author
  * @function Home
  **/
 
-const Home = (props) => {
+const Home = (_props) => {
 
   const [firstName, setFirstName] = useState("")
-  const [middeName, setMiddleName] = useState("")
+  const [middleName, setMiddleName] = useState("")
   const [lastName, setLastName] = useState("")
   const [directManageId, setDirectManageId] = useState("")
   const [DOB, setDOB] = useState("")
@@ -23,11 +31,9 @@ const Home = (props) => {
   const [contactDetails, setContactDetails] = useState(null)
 
   const dispatch = useDispatch()
-  const contact = useSelector((state)=>state.contact)
+  const contact = useSelector( (state) => state.contact )
 
-  const handleClose = () => {
-    setShow(false)
-  }
+  const handleClose = () => setShow(false)
 
   const renderContacts = () => {
     return (
@@ -42,17 +48,19 @@ const Home = (props) => {
           </tr>
         </thead>
         <tbody>
+
           {contact.contacts.length > 0
-          ? contact.contacts.map((contact)=>(
+          ? contact.contacts.map((contact , i) => (
             <tr key = {contact._id}>
-              <td>2</td>
+              <td>{i+1}</td>
               <td>{contact.firstName} {contact.middleName} {contact.lastName}</td>
               <td>{contact.directManageId}</td>
-              <td>{contact.startDate}</td>
+              <td>{moment(contact.startDate).format('DD/MM/yyyy')}</td>
               <td></td>
             </tr>
           ))
           : null}
+
         </tbody>
       </Table>
     );
@@ -64,9 +72,42 @@ const Home = (props) => {
       <Container>
         <Row style={{ marginTop: "100px" }}>
           <Col>
-          <h2 style={{marginLeft:"30%"}}>Contact Management System</h2>
-          <Button variant="dark">Add Contact</Button>
-          {renderContacts()}
+
+            <h2 style={{marginLeft:"30%"}}>Contact Management System</h2>
+
+            <div style={{ display : 'flex' }}>
+
+              <Button variant="dark">Add Contact</Button>
+
+              <input placeholder='First name' onChange={e => setFirstName(e.target.value)} />
+              <input placeholder='Middle name' onChange={e => setMiddleName(e.target.value)} />
+              <input placeholder='Last name' onChange={e => setLastName(e.target.value)} />
+
+              <Button onClick={e => {
+
+                let obj = {
+                  fName : firstName !== '' ? firstName : undefined , 
+                  mName : middleName !== '' ? middleName : undefined , 
+                  lName : lastName !== '' ? lastName : undefined
+                }
+                axios.post( apibase.localHost+'/api/contact/search' , obj )
+                .then(res => {
+                  let data = res.data.data
+                  dispatch({
+                    type : contactConstants.GET_ALL_CONTACTS_SUCCESS ,
+                    payload : {
+                      contacts : data
+                    }
+                  })
+                })
+              }}>
+                <i>
+
+                </i>
+              </Button>
+
+            </div>
+            {renderContacts()}
           </Col>
         </Row>
       </Container>
